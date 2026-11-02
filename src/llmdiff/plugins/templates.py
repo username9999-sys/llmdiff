@@ -16,9 +16,10 @@ Available templates:
 from __future__ import annotations
 
 import string
+from collections.abc import Mapping
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Mapping
+from typing import Any
 
 from llmdiff.core.errors import PluginError
 
@@ -239,7 +240,7 @@ from __future__ import annotations
 import importlib.util
 from pathlib import Path
 
-PLUGIN_FILE = Path(__file__).resolve().parent.parent / "${name}" / "plugin.py"
+PLUGIN_FILE = Path(__file__).resolve().parent.parent / "${name}/plugin.py"
 
 
 def _load_module():

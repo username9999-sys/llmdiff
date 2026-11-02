@@ -30,7 +30,6 @@ from llmdiff.integrations.datadog import (
     DatadogMetricsReporter,
     MetricPoint,
     build_metrics_payload,
-    metrics_from_result,
 )
 from llmdiff.integrations.discord_app import (
     DiscordApp,
@@ -97,8 +96,8 @@ from llmdiff.integrations.linear_app import (
     build_verdict_description,
 )
 from llmdiff.integrations.opsgenie import (
-    OpsgenieAlerter,
     OpsgenieAlert,
+    OpsgenieAlerter,
     OpsgenieClient,
     OpsgenieError,
     alias_for_result,

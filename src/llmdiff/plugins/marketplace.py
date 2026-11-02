@@ -37,13 +37,14 @@ import json
 import shutil
 import urllib.request
 import zipfile
+from collections.abc import Callable, Mapping
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Callable, Mapping
+from typing import Any
 
 from llmdiff.core.errors import PluginError
 from llmdiff.plugins.loader import DEFAULT_PLUGIN_DIR
-from llmdiff.plugins.manifest import PluginManifest, load_manifest
+from llmdiff.plugins.manifest import load_manifest
 
 __all__ = [
     "INDEX_FILENAME",
@@ -205,10 +206,10 @@ class MarketplaceIndex:
         for entry in self.entries.values():
             if not needle:
                 results.append(entry)
-                continue
-            haystack = f"{entry.name} {entry.description} {entry.author}".lower()
-            if needle in haystack:
-                results.append(entry)
+            else:
+                haystack = f"{entry.name} {entry.description} {entry.author}".lower()
+                if needle in haystack:
+                    results.append(entry)
             if len(results) >= limit:
                 break
         return tuple(results)
@@ -274,7 +275,12 @@ class Marketplace:
 
     def _read(self, url_or_path: str) -> bytes:
         if url_or_path.startswith(("http://", "https://")):
-            return self.fetcher(url_or_path)
+            try:
+                return self.fetcher(url_or_path)
+            except Exception as exc:
+                raise PluginError(
+                    f"failed to fetch {url_or_path}: {type(exc).__name__}: {exc}"
+                ) from exc
         path = Path(url_or_path)
         if not path.is_file():
             raise PluginError(f"marketplace index not found: {path}")
@@ -384,16 +390,18 @@ class Marketplace:
         return True
 
     def list_installed(self) -> tuple[str, ...]:
-        """Return names of installed plugins (subdirectories with a manifest)."""
+        """Return names of installed plugins (dirs containing a manifest, any depth)."""
         if not self.install_dir.is_dir():
             return ()
         names: list[str] = []
-        for child in sorted(self.install_dir.iterdir()):
-            if child.is_dir() and any(
-                (child / basename).is_file()
-                for basename in ("llmdiff-plugin.yaml", "llmdiff-plugin.yml", "llmdiff-plugin.toml")
-            ):
-                names.append(child.name)
+        for manifest in sorted(self.install_dir.rglob("llmdiff-plugin.*")):
+            if manifest.name not in ("llmdiff-plugin.yaml", "llmdiff-plugin.yml", "llmdiff-plugin.toml"):
+                continue
+            # The plugin dir is the top-level child under install_dir.
+            rel = manifest.relative_to(self.install_dir)
+            top = rel.parts[0] if rel.parts else manifest.parent.name
+            if top not in names:
+                names.append(top)
         return tuple(names)
 
     def is_installed(self, name: str) -> bool:

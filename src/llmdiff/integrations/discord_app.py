@@ -106,10 +106,10 @@ def verify_discord_signature(
         raise DiscordError("Discord public key must be 32 bytes (64 hex chars)")
     message = timestamp.encode("utf-8") + body
     try:
+        from cryptography.exceptions import InvalidSignature  # type: ignore[import-untyped]
         from cryptography.hazmat.primitives.asymmetric.ed25519 import (  # type: ignore[import-untyped]
             Ed25519PublicKey,
         )
-        from cryptography.exceptions import InvalidSignature  # type: ignore[import-untyped]
     except ImportError:
         return allow_unverified
     key = Ed25519PublicKey.from_public_bytes(public_key_bytes)

@@ -9,11 +9,6 @@ from __future__ import annotations
 
 import argparse
 
-from llmdiff.cli.list_cmd import (
-    add_checks_parser,
-    add_reporters_parser,
-    add_version_parser,
-)
 from llmdiff.cli.compare import add_compare_parser
 from llmdiff.cli.config_cmd import add_config_parser
 from llmdiff.cli.demo_cmd import add_demo_parser
@@ -22,6 +17,11 @@ from llmdiff.cli.export_cmd import add_export_parser
 from llmdiff.cli.gate_cmd import add_gate_parser
 from llmdiff.cli.import_cmd import add_import_parser
 from llmdiff.cli.init_cmd import add_init_parser
+from llmdiff.cli.list_cmd import (
+    add_checks_parser,
+    add_reporters_parser,
+    add_version_parser,
+)
 from llmdiff.cli.plugins_cmd import add_plugins_parser
 from llmdiff.cli.record_cmd import add_record_parser
 from llmdiff.cli.replay_cmd import add_replay_parser

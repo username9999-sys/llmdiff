@@ -14,7 +14,8 @@ import csv
 import html
 import io
 import json
-from typing import Any, Mapping
+from collections.abc import Mapping
+from typing import Any
 
 from llmdiff.core import DiffResult
 from llmdiff.core.checks import Verdict

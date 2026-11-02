@@ -18,11 +18,12 @@ from __future__ import annotations
 import csv
 import io
 import json
+from collections.abc import Iterable, Mapping
 from pathlib import Path
-from typing import Any, Iterable, Mapping
+from typing import Any
 
 from llmdiff.core import Case, Corpus
-from llmdiff.core.errors import CorpusError, FormatError
+from llmdiff.core.errors import FormatError
 
 __all__ = [
     "load_corpus",

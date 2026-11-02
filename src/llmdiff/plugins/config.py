@@ -22,11 +22,12 @@ Example::
 from __future__ import annotations
 
 import os
-import tomllib
 from collections.abc import Mapping
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
+
+import tomllib
 
 from llmdiff.core.errors import ConfigError, PluginError
 

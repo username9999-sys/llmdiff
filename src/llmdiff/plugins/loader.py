@@ -33,7 +33,7 @@ import importlib.util
 import inspect
 import sys
 import traceback
-from collections.abc import Callable, Iterable, Iterator, Mapping
+from collections.abc import Callable, Iterable, Iterator
 from dataclasses import dataclass, field
 from pathlib import Path
 from types import ModuleType
@@ -377,9 +377,16 @@ def load_directory(
             else:
                 loaded.append(load_file(path, allowed_permissions=allowed_permissions))
         except PluginError as exc:
+            # Prefer the manifest name so a broken plugin keeps its real name.
+            name = path.stem
+            if path.name in MANIFEST_BASENAMES:
+                try:
+                    name = load_manifest(path, check_entry=False).name
+                except PluginError:
+                    name = path.parent.name if path.parent != base else path.stem
             loaded.append(
                 LoadedPlugin(
-                    name=path.stem,
+                    name=name,
                     obj=None,
                     source="file",
                     path=str(path),

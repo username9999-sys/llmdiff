@@ -16,9 +16,8 @@ Auth: HTTP Basic with ``email:api_token`` base64-encoded.
 from __future__ import annotations
 
 import base64
-import json
 from collections.abc import Mapping, Sequence
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Any, Protocol
 from urllib.parse import quote
 
@@ -179,7 +178,6 @@ def markdown_to_adf(markdown: str) -> dict[str, Any]:
 def _inline_nodes(text: str) -> list[dict[str, Any]]:
     """Parse inline ``**bold**`` and ```` ``code`` ```` into ADF inline nodes."""
     nodes: list[dict[str, Any]] = []
-    pattern_parts: list[str] = []
     # Split on bold and code markers, keeping the markers.
     import re
 
@@ -282,7 +280,7 @@ def build_jql(*, project: str, labels: Sequence[str] = (), text: str = "", max_r
         clauses.append(f'text ~ "{text}"')
     if not clauses:
         raise JiraError("build_jql needs at least one of project/labels/text")
-    return " AND ".join(clauses) + f" ORDER BY created DESC"
+    return " AND ".join(clauses) + " ORDER BY created DESC"
 
 
 def build_issue_payload(

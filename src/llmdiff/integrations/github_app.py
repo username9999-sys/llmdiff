@@ -22,7 +22,7 @@ from __future__ import annotations
 import hashlib
 import hmac
 import json
-from collections.abc import Callable, Mapping, Sequence
+from collections.abc import Callable, Mapping
 from dataclasses import dataclass, field
 from typing import Any, Protocol
 

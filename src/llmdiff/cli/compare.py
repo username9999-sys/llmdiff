@@ -10,7 +10,6 @@ Usage::
 from __future__ import annotations
 
 import argparse
-from typing import Sequence
 
 from llmdiff.cli.config import CliConfig
 from llmdiff.cli.corpus_io import load_corpus

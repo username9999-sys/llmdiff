@@ -7,6 +7,7 @@ win/tie/loss verdict matrix instead of a vague "looks fine".
 from __future__ import annotations
 
 from llmdiff.core import (
+    DEFAULT_TOLERANCE,
     Case,
     CaseDiff,
     Check,
@@ -18,7 +19,6 @@ from llmdiff.core import (
     Corpus,
     CorpusError,
     CorpusStats,
-    DEFAULT_TOLERANCE,
     DiffConfig,
     DiffEngine,
     DiffResult,

@@ -14,7 +14,7 @@ import argparse
 from collections import Counter
 
 from llmdiff.cli.corpus_io import load_corpus
-from llmdiff.cli.output import emit, err, print_kv, print_table, rule
+from llmdiff.cli.output import emit, err
 from llmdiff.core.errors import LLMDiffError
 
 __all__ = ["run_stats", "add_stats_parser", "prompt_length_histogram", "corpus_report"]

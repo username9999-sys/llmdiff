@@ -18,9 +18,8 @@ Authentication: Events API uses a 32-char routing key; REST API uses a
 from __future__ import annotations
 
 import hashlib
-import json
 from collections.abc import Mapping
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Any, Protocol
 
 from llmdiff.core.errors import LLMDiffError
@@ -300,7 +299,7 @@ class PagerDutyClient:
         params: dict[str, str] = {"limit": str(limit)}
         for status in statuses:
             params.setdefault("statuses[]", "")
-            params[f"statuses[]"] = status  # httpx repeats the key; our mock keeps last
+            params["statuses[]"] = status  # httpx repeats the key; our mock keeps last
         # Build repeated params properly for real httpx:
         response = self.client.get(
             f"{self.api_base}/incidents",

@@ -13,10 +13,12 @@ package itself produces, which keeps the zero-dependency promise (no
 from __future__ import annotations
 
 import os
-import tomllib
+from collections.abc import Mapping
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Mapping
+from typing import Any
+
+import tomllib
 
 from llmdiff.core.errors import ConfigError
 
@@ -62,7 +64,7 @@ class CliConfig:
     extra: dict[str, Any] = field(default_factory=dict)
 
     @classmethod
-    def from_mapping(cls, data: Mapping[str, Any], *, path: Path | None = None) -> "CliConfig":
+    def from_mapping(cls, data: Mapping[str, Any], *, path: Path | None = None) -> CliConfig:
         """Build a config from a parsed TOML mapping, validating known keys."""
         known = {
             "dimensions": None,

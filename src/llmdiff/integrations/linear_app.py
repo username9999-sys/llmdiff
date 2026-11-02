@@ -16,9 +16,8 @@ Auth: ``Authorization: <api_key>`` header (Linear API keys are bearer-style).
 
 from __future__ import annotations
 
-import json
 from collections.abc import Mapping, Sequence
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Any, Protocol
 
 from llmdiff.core.errors import LLMDiffError

@@ -30,7 +30,7 @@ def test_init_stdout(tmp_path, capsys):
     code = main(["init", "--out", "-"])
     out = capsys.readouterr().out
     assert code == 0
-    lines = [l for l in out.splitlines() if l.strip()]
+    lines = [ln for ln in out.splitlines() if ln.strip()]
     assert len(lines) == 5
     for line in lines:
         record = json.loads(line)

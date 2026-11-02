@@ -126,9 +126,18 @@ class Sandbox:
         tracemalloc.start()
         try:
             value = func(*args, **kwargs)
+        except BaseException as exc:
+            if tracemalloc.is_tracing():
+                tracemalloc.stop()
+            if isinstance(exc, (SandboxTimeoutError, SandboxMemoryError, PluginError)):
+                raise
+            raise PluginError(f"sandboxed call raised {type(exc).__name__}: {exc}") from exc
         finally:
-            _, peak = tracemalloc.get_traced_memory()
-            tracemalloc.stop()
+            if tracemalloc.is_tracing():
+                _, peak = tracemalloc.get_traced_memory()
+                tracemalloc.stop()
+            else:
+                peak = 0
         elapsed = time.monotonic() - start
         if elapsed > self.limits.time_limit:
             raise SandboxTimeoutError(
@@ -165,6 +174,8 @@ class Sandbox:
         worker.start()
         finished = done.wait(timeout=self.limits.time_limit)
         elapsed = time.monotonic() - start
+        if finished:
+            worker.join(timeout=1.0)
         if not finished:
             # The worker is a daemon; it will be abandoned. We cannot safely
             # join it, so report a timeout.
@@ -192,10 +203,13 @@ class Sandbox:
     # ------------------------------------------------------------------ #
 
     def _check_result_size(self, value: Any) -> None:
-        try:
-            size = len(repr(value))
-        except Exception:  # noqa: BLE001 - repr must never kill the run
-            return
+        if isinstance(value, (bytes, bytearray, memoryview)):
+            size = len(value)
+        else:
+            try:
+                size = len(repr(value))
+            except Exception:  # noqa: BLE001 - repr must never kill the run
+                return
         if size > self.limits.max_result_repr:
             raise PluginError(
                 f"sandboxed call returned a value whose repr is {size} bytes, "

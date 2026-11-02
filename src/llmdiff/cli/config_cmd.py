@@ -12,9 +12,7 @@ from __future__ import annotations
 import argparse
 
 from llmdiff.cli.config import (
-    CliConfig,
     config_path,
-    get_value,
     load_config,
     save_config,
     set_value,

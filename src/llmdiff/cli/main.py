@@ -14,7 +14,7 @@ the console script always returns a well-defined code.
 from __future__ import annotations
 
 import sys
-from typing import Sequence
+from collections.abc import Sequence
 
 from llmdiff.cli.output import err
 from llmdiff.cli.parser import build_parser

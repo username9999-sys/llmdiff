@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-import json
-
 from llmdiff.cli import main
 from llmdiff.cli.corpus_io import load_corpus, save_corpus
 from llmdiff.cli.diff_cmd import merge_corpora

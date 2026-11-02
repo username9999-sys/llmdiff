@@ -16,7 +16,7 @@ Typical use::
 
 from __future__ import annotations
 
-from collections.abc import Callable, Iterable, Mapping
+from collections.abc import Iterable, Mapping
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
@@ -200,7 +200,7 @@ class PluginRegistry:
             include_entry_points=include_entry_points,
             allowed_permissions=allowed_permissions,
         )
-        self.hooks = hooks or HookManager()
+        self.hooks = hooks if hooks is not None else HookManager()
         self.config_store = config_store or ConfigStore()
         self.default_limits = default_limits or SandboxLimits()
         self.entries = {}

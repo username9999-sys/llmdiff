@@ -9,8 +9,9 @@ descriptions; the CLI catches it and exits with code 1.
 from __future__ import annotations
 
 import json
+from collections.abc import Mapping
 from pathlib import Path
-from typing import Any, Mapping
+from typing import Any
 
 from llmdiff.core import DiffResult
 from llmdiff.core.errors import FormatError, RegressionGateError
@@ -59,7 +60,7 @@ class GateThresholds:
             or self.min_win_rate is not None
         )
 
-    def with_defaults(self) -> "GateThresholds":
+    def with_defaults(self) -> GateThresholds:
         """Return a copy with unset thresholds replaced by the gate defaults."""
         return GateThresholds(
             max_loss_rate=0.05 if self.max_loss_rate is None else self.max_loss_rate,
@@ -75,7 +76,7 @@ class GateThresholds:
         }
 
     @classmethod
-    def from_mapping(cls, data: Mapping[str, Any]) -> "GateThresholds":
+    def from_mapping(cls, data: Mapping[str, Any]) -> GateThresholds:
         return cls(
             max_loss_rate=data.get("max_loss_rate"),
             max_regressed_dims=data.get("max_regressed_dims"),

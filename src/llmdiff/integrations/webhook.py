@@ -504,10 +504,7 @@ class WebhookDispatcher:
 
     def send_result(self, url: str, result: Any, *, event: str = "verdict.completed") -> DeliveryRecord:
         """Convenience: send a :class:`~llmdiff.core.result.DiffResult` as JSON."""
-        if hasattr(result, "to_dict"):
-            payload = result.to_dict()
-        else:
-            payload = {"result": result}
+        payload = result.to_dict() if hasattr(result, "to_dict") else {"result": result}
         return self.send(url, event, payload)
 
     def retry_pending(self, *, limit: int = 100) -> list[DeliveryRecord]:

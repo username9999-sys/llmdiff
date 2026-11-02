@@ -21,7 +21,7 @@ from __future__ import annotations
 
 import time
 from collections.abc import Callable, Mapping
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Any, Protocol
 from urllib.parse import quote
 
@@ -215,11 +215,10 @@ class JenkinsClient:
 
     def _job_path(self, job: str, *extra: str) -> str:
         # Support nested folders via "folder/job" -> "job/folder/job".
-        parts = [quote(part, safe="") for part in job.split("/") if part]
-        segments = [part for segment in parts]
+        segments = [quote(part, safe="") for part in job.split("/") if part]
         for extra_part in extra:
             segments.append(quote(extra_part, safe=""))
-        return f"{self.base_url}/" + "/".join(["job"] * 0 + ["job/".join(segments[:1])]) if False else self._build_job_url(segments)
+        return self._build_job_url(segments)
 
     def _build_job_url(self, segments: list[str]) -> str:
         path = "/job/".join(segments)

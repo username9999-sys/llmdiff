@@ -28,10 +28,12 @@ entry file must exist next to the manifest when ``check_entry=True``.
 from __future__ import annotations
 
 import re
-import tomllib
+from collections.abc import Mapping
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Mapping
+from typing import Any
+
+import tomllib
 
 from llmdiff.core.errors import PluginError
 

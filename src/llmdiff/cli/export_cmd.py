@@ -13,7 +13,7 @@ from __future__ import annotations
 
 import argparse
 
-from llmdiff.cli.corpus_io import detect_format, load_corpus, save_corpus
+from llmdiff.cli.corpus_io import load_corpus, save_corpus
 from llmdiff.cli.output import emit, err, style
 from llmdiff.core.errors import LLMDiffError
 
@@ -42,10 +42,9 @@ def run_export(args: argparse.Namespace) -> int:
     try:
         corpus = load_corpus(args.input, fmt=args.from_fmt)
         out_path = args.out
-        if str(out_path) != "-":
+        if str(out_path) != "-" and not str(out_path).lower().endswith(f".{args.to}"):
             # Ensure the suffix matches the target format for detect_format.
-            if not str(out_path).lower().endswith(f".{args.to}"):
-                out_path = f"{out_path}.{args.to}"
+            out_path = f"{out_path}.{args.to}"
         written = save_corpus(corpus, out_path, fmt=args.to)
     except LLMDiffError as exc:
         err(f"error: {exc}")

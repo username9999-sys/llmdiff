@@ -14,9 +14,8 @@ The transport is injectable (``httpx.Client``-like) so tests run offline.
 from __future__ import annotations
 
 import hashlib
-import json
 from collections.abc import Mapping, Sequence
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Any, Protocol
 
 from llmdiff.core.errors import LLMDiffError
