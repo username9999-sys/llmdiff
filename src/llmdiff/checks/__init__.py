@@ -9,6 +9,9 @@ from llmdiff.checks.code import (
     FencedCodeCheck,
     PythonSyntaxCheck,
 )
+from llmdiff.checks.composite import WeightedCompositeCheck
+from llmdiff.checks.cost import CostCheck, LatencyCheck, TokenCountCheck
+from llmdiff.checks.diffview import DiffHunkCountCheck, EditDistanceCheck, LineChangeRatioCheck
 from llmdiff.checks.entropy import EntropyCheck, RepetitionCheck
 from llmdiff.checks.format import (
     CsvShapeCheck,
@@ -20,6 +23,12 @@ from llmdiff.checks.format import (
     MarkdownTablesCheck,
     XmlValidCheck,
     YamlValidCheck,
+)
+from llmdiff.checks.lists import (
+    ListItemCountCheck,
+    ListItemOverlapCheck,
+    ListOrderCheck,
+    TableShapeCheck,
 )
 from llmdiff.checks.ngram import (
     NgramF1Check,
@@ -78,6 +87,17 @@ __all__ = [
     "NumberPreservedCheck",
     "NumberDriftCheck",
     "MeanAbsoluteErrorCheck",
+    "ListItemCountCheck",
+    "ListItemOverlapCheck",
+    "ListOrderCheck",
+    "TableShapeCheck",
+    "EditDistanceCheck",
+    "DiffHunkCountCheck",
+    "LineChangeRatioCheck",
+    "LatencyCheck",
+    "TokenCountCheck",
+    "CostCheck",
+    "WeightedCompositeCheck",
 ]
 
 
@@ -121,4 +141,14 @@ def builtin_checks() -> tuple[Check, ...]:
         NumberPreservedCheck(),
         NumberDriftCheck(),
         MeanAbsoluteErrorCheck(),
+        ListItemCountCheck(),
+        ListItemOverlapCheck(),
+        ListOrderCheck(),
+        TableShapeCheck(),
+        EditDistanceCheck(),
+        DiffHunkCountCheck(),
+        LineChangeRatioCheck(),
+        LatencyCheck(),
+        TokenCountCheck(),
+        CostCheck(),
     )
