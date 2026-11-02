@@ -1,0 +1,268 @@
+"""Self-contained HTML report renderer.
+
+Produces a single ``.html`` file with inline CSS (no external dependencies,
+works offline and in CI artifacts): summary cards, a verdict matrix table with
+CSS bar charts for win/tie/loss, expandable ``<details>`` per-case sections,
+an inline SVG bar chart of per-dimension win rates, and dark-mode support via
+``prefers-color-scheme``. All dynamic content is escaped with
+:func:`html.escape`.
+"""
+
+from __future__ import annotations
+
+import html
+from datetime import datetime, timezone
+from typing import Any
+
+from llmdiff.core.result import DiffResult
+from llmdiff.reporters.base import (
+    BaseReporter,
+    config_to_dict,
+    format_delta,
+    format_pct,
+    format_score,
+)
+
+__all__ = ["HtmlReporter"]
+
+_CSS = """
+:root {
+  --bg: #ffffff; --fg: #1a1a1a; --muted: #666; --border: #e0e0e0;
+  --card: #f7f7f8; --win: #1a7f37; --tie: #9a6700; --loss: #cf222e;
+  --accent: #0969da; --code-bg: #f0f0f2;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0d1117; --fg: #e6edf3; --muted: #8b949e; --border: #30363d;
+    --card: #161b22; --win: #3fb950; --tie: #d29922; --loss: #f85149;
+    --accent: #58a6ff; --code-bg: #161b22;
+  }
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--fg);
+  font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  margin: 0; padding: 2rem; line-height: 1.5; }
+main { max-width: 1000px; margin: 0 auto; }
+h1 { font-size: 1.6rem; margin-bottom: 0.25rem; }
+h2 { margin-top: 2rem; border-bottom: 1px solid var(--border); padding-bottom: .3rem; }
+.meta { color: var(--muted); font-size: .85rem; }
+.cards { display: flex; flex-wrap: wrap; gap: 1rem; margin: 1rem 0; }
+.card { background: var(--card); border: 1px solid var(--border);
+  border-radius: 8px; padding: .8rem 1.2rem; min-width: 130px; }
+.card .num { font-size: 1.5rem; font-weight: 700; }
+.card .lbl { color: var(--muted); font-size: .8rem; text-transform: uppercase; }
+.card.win .num { color: var(--win); }
+.card.tie .num { color: var(--tie); }
+.card.loss .num { color: var(--loss); }
+table { border-collapse: collapse; width: 100%; margin: 1rem 0; font-size: .9rem; }
+th, td { border: 1px solid var(--border); padding: .4rem .6rem; text-align: left; }
+th { background: var(--card); }
+td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+.bar { position: relative; height: 10px; background: var(--border);
+  border-radius: 5px; min-width: 80px; overflow: hidden; }
+.bar > span { position: absolute; top: 0; bottom: 0; }
+.bar .w { left: 0; background: var(--win); }
+.bar .t { background: var(--tie); }
+.bar .l { right: 0; background: var(--loss); }
+.verdict-win { color: var(--win); font-weight: 600; }
+.verdict-tie { color: var(--tie); font-weight: 600; }
+.verdict-loss { color: var(--loss); font-weight: 600; }
+details { border: 1px solid var(--border); border-radius: 6px;
+  margin: .5rem 0; padding: .5rem .8rem; background: var(--card); }
+summary { cursor: pointer; font-weight: 600; }
+pre { background: var(--code-bg); padding: .6rem .8rem; border-radius: 6px;
+  overflow-x: auto; font-size: .8rem; }
+code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+footer { margin-top: 2.5rem; color: var(--muted); font-size: .8rem;
+  border-top: 1px solid var(--border); padding-top: .8rem; }
+svg text { fill: var(--fg); font-size: 11px; }
+"""
+
+
+def _esc(value: Any) -> str:
+    return html.escape(str(value), quote=True)
+
+
+def _utc_stamp() -> str:
+    return datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")
+
+
+class HtmlReporter(BaseReporter):
+    """Render a :class:`DiffResult` as a self-contained HTML page."""
+
+    name = "html"
+
+    def __init__(self, *, title: str = "llmdiff report", dark_mode: bool = True) -> None:
+        self.title = title
+        self.dark_mode = dark_mode
+
+    # ------------------------------------------------------------------ API
+
+    def render(self, result: DiffResult) -> str:
+        """Render the full HTML report for ``result``."""
+        matrix = result.matrix
+        parts: list[str] = [
+            "<!DOCTYPE html>",
+            '<html lang="en">',
+            "<head>",
+            '<meta charset="utf-8">',
+            '<meta name="viewport" content="width=device-width, initial-scale=1">',
+            f"<title>{_esc(self.title)}</title>",
+            f"<style>{_CSS}</style>",
+            "</head>",
+            "<body>",
+            "<main>",
+            f"<h1>{_esc(self.title)}</h1>",
+            f'<p class="meta">Generated {_esc(_utc_stamp())}'
+            f" &middot; {matrix.total_cases} case(s) &middot; "
+            f"{len(matrix.dimensions)} dimension(s)</p>",
+            self._cards(result),
+            self._svg_chart(result),
+            self._matrix_table(result),
+            self._cases_section(result),
+            self._config_section(result),
+            "<footer>Generated by llmdiff reporters.html</footer>",
+            "</main>",
+            "</body>",
+            "</html>",
+        ]
+        return "\n".join(parts) + "\n"
+
+    # ------------------------------------------------------------- sections
+
+    def _cards(self, result: DiffResult) -> str:
+        matrix = result.matrix
+        verdict_class = f"verdict-{matrix.verdict}"
+        cards = [
+            ("verdict", matrix.verdict.upper(), verdict_class),
+            ("win", str(matrix.wins), "win"),
+            ("tie", str(matrix.ties), "tie"),
+            ("loss", str(matrix.losses), "loss"),
+            ("regression rate", format_pct(matrix.regression_rate),
+             "loss" if matrix.losses else "win"),
+        ]
+        items = "".join(
+            f'<div class="card {cls}"><div class="num">{_esc(num)}</div>'
+            f'<div class="lbl">{_esc(lbl)}</div></div>'
+            for lbl, num, cls in cards
+        )
+        return f'<div class="cards">{items}</div>'
+
+    def _svg_chart(self, result: DiffResult) -> str:
+        """Inline SVG bar chart: per-dimension stacked win/tie/loss bars."""
+        dims = result.matrix.dimensions
+        if not dims:
+            return ""
+        bar_h, gap, left, top, width = 18, 8, 110, 24, 420
+        height = top + len(dims) * (bar_h + gap) + 10
+        parts = [
+            '<h2>Win / tie / loss by dimension</h2>',
+            f'<svg width="100%" viewBox="0 0 {left + width + 20} {height}" '
+            'role="img" aria-label="verdict bar chart">',
+        ]
+        for i, summary in enumerate(dims):
+            total = summary.total or 1
+            y = top + i * (bar_h + gap)
+            w_win = width * summary.wins / total
+            w_tie = width * summary.ties / total
+            w_loss = width * summary.losses / total
+            parts.append(f'<text x="0" y="{y + bar_h - 5}">{_esc(summary.dimension)}</text>')
+            x = left
+            if w_win:
+                title = f"{_esc(summary.dimension)}: {summary.wins} wins"
+                parts.append(
+                    f'<rect class="w" x="{x:.1f}" y="{y}" width="{w_win:.1f}" '
+                    f'height="{bar_h}" fill="var(--win)">'
+                    f"<title>{title}</title></rect>"
+                )
+                x += w_win
+            if w_tie:
+                title = f"{_esc(summary.dimension)}: {summary.ties} ties"
+                parts.append(
+                    f'<rect x="{x:.1f}" y="{y}" width="{w_tie:.1f}" height="{bar_h}" '
+                    f'fill="var(--tie)"><title>{title}</title></rect>'
+                )
+                x += w_tie
+            if w_loss:
+                title = f"{_esc(summary.dimension)}: {summary.losses} losses"
+                parts.append(
+                    f'<rect x="{x:.1f}" y="{y}" width="{w_loss:.1f}" height="{bar_h}" '
+                    f'fill="var(--loss)"><title>{title}</title></rect>'
+                )
+        parts.append("</svg>")
+        return "\n".join(parts)
+
+    def _matrix_table(self, result: DiffResult) -> str:
+        rows = [
+            "<h2>Verdict matrix</h2>",
+            "<table>",
+            "<tr><th>Dimension</th><th>Verdict</th><th class='num'>W</th><th class='num'>T</th>"
+            "<th class='num'>L</th><th>Share</th><th class='num'>Baseline</th>"
+            "<th class='num'>Candidate</th><th class='num'>Delta</th></tr>",
+        ]
+        for summary in result.matrix.dimensions:
+            total = summary.total or 1
+            pct_w = 100 * summary.wins / total
+            pct_t = 100 * summary.ties / total
+            pct_l = 100 * summary.losses / total
+            bar = (
+                f'<div class="bar">'
+                f'<span class="w" style="width:{pct_w:.1f}%"></span>'
+                f'<span class="t" style="left:{pct_w:.1f}%;width:{pct_t:.1f}%"></span>'
+                f'<span class="l" style="width:{pct_l:.1f}%"></span>'
+                f"</div>"
+            )
+            rows.append(
+                "<tr>"
+                f"<td><code>{_esc(summary.dimension)}</code></td>"
+                f'<td class="verdict-{summary.verdict}">{_esc(summary.verdict)}</td>'
+                f"<td class='num'>{summary.wins}</td>"
+                f"<td class='num'>{summary.ties}</td>"
+                f"<td class='num'>{summary.losses}</td>"
+                f"<td>{bar}</td>"
+                f"<td class='num'>{format_score(summary.baseline_mean)}</td>"
+                f"<td class='num'>{format_score(summary.candidate_mean)}</td>"
+                f"<td class='num'>{format_delta(summary.delta)}</td>"
+                "</tr>"
+            )
+        rows.append("</table>")
+        return "\n".join(rows)
+
+    def _cases_section(self, result: DiffResult) -> str:
+        lines = ["<h2>Cases</h2>"]
+        if not result.cases:
+            lines.append("<p>No cases.</p>")
+            return "\n".join(lines)
+        for case in result.cases:
+            cls = f"verdict-{case.verdict}"
+            lines.append(
+                f"<details><summary><span class='{cls}'>{_esc(case.verdict.upper())}</span> "
+                f"<code>{_esc(case.case_id)}</code> "
+                f"({case.wins}W/{case.ties}T/{case.losses}L)</summary>"
+            )
+            lines.append("<table><tr><th>Dimension</th><th>Verdict</th>"
+                         "<th class='num'>Baseline</th><th class='num'>Candidate</th>"
+                         "<th class='num'>Delta</th><th>Detail</th></tr>")
+            for check in case.results:
+                lines.append(
+                    "<tr>"
+                    f"<td><code>{_esc(check.dimension)}</code></td>"
+                    f"<td class='verdict-{check.verdict.value}'>{_esc(check.verdict.value)}</td>"
+                    f"<td class='num'>{format_score(check.baseline_score)}</td>"
+                    f"<td class='num'>{format_score(check.candidate_score)}</td>"
+                    f"<td class='num'>{format_delta(check.delta)}</td>"
+                    f"<td>{_esc(check.detail)}</td>"
+                    "</tr>"
+                )
+            lines.append("</table></details>")
+        return "\n".join(lines)
+
+    def _config_section(self, result: DiffResult) -> str:
+        import json
+
+        payload = {
+            "total_cases": result.matrix.total_cases,
+            "config": config_to_dict(result.config),
+        }
+        text = json.dumps(payload, indent=2, sort_keys=True, default=str)
+        return f"<h2>Configuration</h2>\n<pre>{_esc(text)}</pre>"
