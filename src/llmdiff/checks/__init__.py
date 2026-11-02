@@ -2,7 +2,25 @@
 
 from __future__ import annotations
 
+from llmdiff.checks.code import (
+    BraceBalanceCheck,
+    CodeBlockCountCheck,
+    CodeHasDefinitionsCheck,
+    FencedCodeCheck,
+    PythonSyntaxCheck,
+)
 from llmdiff.checks.entropy import EntropyCheck, RepetitionCheck
+from llmdiff.checks.format import (
+    CsvShapeCheck,
+    HtmlTagBalanceCheck,
+    LatexBalanceCheck,
+    LinkCountCheck,
+    MarkdownHeadingsCheck,
+    MarkdownListsCheck,
+    MarkdownTablesCheck,
+    XmlValidCheck,
+    YamlValidCheck,
+)
 from llmdiff.checks.ngram import (
     NgramF1Check,
     NgramPrecisionCheck,
@@ -27,6 +45,20 @@ __all__ = [
     "NgramF1Check",
     "EntropyCheck",
     "RepetitionCheck",
+    "PythonSyntaxCheck",
+    "BraceBalanceCheck",
+    "CodeBlockCountCheck",
+    "CodeHasDefinitionsCheck",
+    "FencedCodeCheck",
+    "MarkdownHeadingsCheck",
+    "MarkdownListsCheck",
+    "MarkdownTablesCheck",
+    "LinkCountCheck",
+    "LatexBalanceCheck",
+    "XmlValidCheck",
+    "HtmlTagBalanceCheck",
+    "YamlValidCheck",
+    "CsvShapeCheck",
 ]
 
 
@@ -45,4 +77,18 @@ def builtin_checks() -> tuple[Check, ...]:
         NgramF1Check(),
         EntropyCheck(),
         RepetitionCheck(),
+        PythonSyntaxCheck(),
+        BraceBalanceCheck(),
+        CodeBlockCountCheck(),
+        CodeHasDefinitionsCheck(),
+        FencedCodeCheck(),
+        MarkdownHeadingsCheck(),
+        MarkdownListsCheck(),
+        MarkdownTablesCheck(),
+        LinkCountCheck(),
+        LatexBalanceCheck(),
+        XmlValidCheck(),
+        HtmlTagBalanceCheck(),
+        YamlValidCheck(),
+        CsvShapeCheck(),
     )
