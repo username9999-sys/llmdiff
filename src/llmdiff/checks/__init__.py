@@ -11,6 +11,7 @@ from llmdiff.checks.code import (
 )
 from llmdiff.checks.composite import WeightedCompositeCheck
 from llmdiff.checks.cost import CostCheck, LatencyCheck, TokenCountCheck
+from llmdiff.checks.custom_regex import RegexForbiddenCheck, RegexMustMatchCheck
 from llmdiff.checks.diffview import DiffHunkCountCheck, EditDistanceCheck, LineChangeRatioCheck
 from llmdiff.checks.entropy import EntropyCheck, RepetitionCheck
 from llmdiff.checks.format import (
@@ -24,6 +25,7 @@ from llmdiff.checks.format import (
     XmlValidCheck,
     YamlValidCheck,
 )
+from llmdiff.checks.judge import JudgeCheck
 from llmdiff.checks.lists import (
     ListItemCountCheck,
     ListItemOverlapCheck,
@@ -44,8 +46,15 @@ from llmdiff.checks.qa import (
     NumberConsistencyCheck,
 )
 from llmdiff.checks.safety import PiiCheck, PromptLeakCheck, SecretCheck, ToxicityCheck
+from llmdiff.checks.semantic import SemanticSimilarityCheck
 from llmdiff.checks.structure import JsonValidCheck, StructureCheck
 from llmdiff.checks.text import ContentCheck, ExactMatchCheck, LengthCheck, SimilarityCheck
+from llmdiff.checks.unicode import (
+    ControlCharCheck,
+    MojibakeCheck,
+    RtlMarkCheck,
+    UnicodeScriptCheck,
+)
 from llmdiff.core.checks import Check
 
 __all__ = [
@@ -98,6 +107,14 @@ __all__ = [
     "TokenCountCheck",
     "CostCheck",
     "WeightedCompositeCheck",
+    "UnicodeScriptCheck",
+    "MojibakeCheck",
+    "ControlCharCheck",
+    "RtlMarkCheck",
+    "RegexMustMatchCheck",
+    "RegexForbiddenCheck",
+    "SemanticSimilarityCheck",
+    "JudgeCheck",
 ]
 
 
@@ -151,4 +168,12 @@ def builtin_checks() -> tuple[Check, ...]:
         LatencyCheck(),
         TokenCountCheck(),
         CostCheck(),
+        UnicodeScriptCheck(),
+        MojibakeCheck(),
+        ControlCharCheck(),
+        RtlMarkCheck(),
+        RegexMustMatchCheck(),
+        RegexForbiddenCheck(),
+        SemanticSimilarityCheck(),
+        JudgeCheck(),
     )
