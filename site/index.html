@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="llmdiff — git diff for LLM outputs. Replay real production traffic against a new prompt or model and get a win/tie/loss verdict matrix.">
+<title>llmdiff — git diff for LLM outputs</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="hero">
+  <nav class="nav">
+    <span class="brand">llmdiff</span>
+    <div class="links">
+      <a href="#how">How it works</a>
+      <a href="#matrix">Verdict matrix</a>
+      <a href="#quickstart">Quickstart</a>
+      <a href="#compare">vs others</a>
+      <a href="https://github.com/username9999-sys/llmdiff">GitHub</a>
+    </div>
+  </nav>
+  <div class="hero-body">
+    <h1>Git diff for LLM outputs.</h1>
+    <p class="tagline">Replay real production traffic against a new prompt or model.
+    Get a <strong>win / tie / loss verdict matrix</strong> instead of a vague "looks fine".</p>
+    <pre class="install"><code>pip install llmdiff
+llmdiff demo        # offline demo, no API key needed</code></pre>
+    <p class="cta">
+      <a class="btn primary" href="https://github.com/username9999-sys/llmdiff">Star on GitHub</a>
+      <a class="btn" href="#quickstart">Quickstart</a>
+    </p>
+  </div>
+</header>
+
+<main>
+<section id="problem">
+  <h2>The problem</h2>
+  <p>You change a prompt. Tests pass. You ship it. Two days later support notices that
+  answers quietly got worse — dropped fields, truncated replies, refusals — and nobody
+  caught it, because there was no test that could.</p>
+  <p>Existing eval tools (promptfoo, Langfuse, DeepEval, Braintrust) are good, but they all
+  start from a <em>hand-written golden dataset</em>. <strong>llmdiff starts from real
+  production traffic</strong>: capture what users actually sent, replay it against the
+  candidate, and compare outputs across independent dimensions.</p>
+</section>
+
+<section id="how">
+  <h2>How it works</h2>
+  <ol class="steps">
+    <li><strong>Capture</strong> — record prompts and outputs from your live system
+      (proxy middleware, SDK wrapper, or import a log).</li>
+    <li><strong>Replay</strong> — send the same prompts to the candidate system
+      (new prompt version, different model, different provider).</li>
+    <li><strong>Compare</strong> — every dimension scores baseline and candidate with the
+      <em>same</em> definition, then derives a verdict per case:
+      <code>win</code> (candidate scored higher), <code>tie</code> (equal within tolerance),
+      <code>loss</code> (regression).</li>
+  </ol>
+</section>
+
+<section id="matrix">
+  <h2>The verdict matrix</h2>
+  <p>One table tells you exactly where the candidate regressed:</p>
+  <div class="table-wrap">
+  <table class="matrix">
+    <thead>
+      <tr><th>dimension</th><th>win</th><th>tie</th><th>loss</th><th>baseline</th><th>candidate</th><th>delta</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>exact</td><td>0</td><td>38</td><td class="loss">2</td><td>1.000</td><td>0.000</td><td class="loss">-1.000</td></tr>
+      <tr><td>similarity</td><td>0</td><td>40</td><td>0</td><td>1.000</td><td>0.812</td><td>-0.188</td></tr>
+      <tr><td>structure</td><td>0</td><td>35</td><td class="loss">5</td><td>1.000</td><td>0.833</td><td class="loss">-0.167</td></tr>
+      <tr><td>json_valid</td><td>0</td><td>38</td><td class="loss">2</td><td>1.000</td><td>0.950</td><td class="loss">-0.050</td></tr>
+      <tr><td>content</td><td>3</td><td>36</td><td class="loss">1</td><td>1.000</td><td>0.975</td><td class="loss">-0.025</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p class="muted">Illustrative numbers. The story: the candidate reworded things
+  (similarity ties), but silently <strong>dropped a JSON field</strong> and broke JSON
+  validity on 2 cases — exactly what <code>structure</code> and <code>json_valid</code> catch.</p>
+</section>
+
+<section id="quickstart">
+  <h2>Quickstart</h2>
+  <pre class="code"><code># A corpus is JSONL, one object per line:
+# {"id": "c1", "prompt": "...", "baseline_output": "...",
+#  "candidate_output": "...", "metadata": {"model": "...", "tags": [...],
+#  "timestamp": "2026-11-01T12:00:00Z"}}
+
+llmdiff init                      # scaffold an example corpus
+llmdiff compare corpus.jsonl      # verdict matrix to stdout (markdown)
+llmdiff compare corpus.jsonl --format json
+llmdiff compare corpus.jsonl --format html --output report.html
+llmdiff compare corpus.jsonl --dimensions structure,json_valid --tolerance 0.05
+
+# CI regression gate (exit 1 when regressions exceed the budget):
+llmdiff compare corpus.jsonl --max-loss-rate 0.05</code></pre>
+</section>
+
+<section id="compare">
+  <h2>vs other tools</h2>
+  <div class="table-wrap">
+  <table class="matrix">
+    <thead><tr><th>tool</th><th>starts from</th><th>output</th><th>llmdiff difference</th></tr></thead>
+    <tbody>
+      <tr><td>promptfoo</td><td>hand-written eval set</td><td>pass/fail per case</td><td>real production traffic in, win/tie/loss matrix out</td></tr>
+      <tr><td>Langfuse</td><td>observability traces</td><td>scores + traces</td><td>regression diffing with CI gate, zero deps</td></tr>
+      <tr><td>DeepEval</td><td>hand-written metrics</td><td>metric scores</td><td>deterministic verdict matrix, no LLM calls by default</td></tr>
+      <tr><td>Braintrust</td><td>hand-written datasets</td><td>experiment tables</td><td>git-diff-style output, SARIF/JUnit for CI</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p class="muted">Those tools are good at what they do. llmdiff is built for one job:
+  "did this prompt/model change make output better or worse, and where?"</p>
+</section>
+
+<section id="ci">
+  <h2>CI gate</h2>
+  <pre class="code"><code># .github/workflows/llmdiff.yml
+- name: LLM regression gate
+  run: |
+    pip install llmdiff
+    llmdiff compare corpus.jsonl --format github --max-loss-rate 0.05</code></pre>
+</section>
+
+<section id="features">
+  <h2>Features</h2>
+  <ul class="features">
+    <li><strong>Zero runtime dependencies</strong> — pure stdlib; optional extras only for embeddings/judge.</li>
+    <li><strong>Deterministic</strong> — same corpus in, same matrix out. No LLM calls unless you enable a judge dimension.</li>
+    <li><strong>60+ built-in dimensions</strong> — text, structure, code, format, safety, QA, numeric, cost.</li>
+    <li><strong>CI-native reporters</strong> — markdown, JSON, HTML, JUnit, SARIF, GitHub comment, Slack, CSV, terminal.</li>
+    <li><strong>Capture</strong> — proxy middleware, OpenAI/Anthropic SDK wrappers, PII redaction, sampling, dedup.</li>
+    <li><strong>Replay</strong> — multi-provider, retry with backoff, response cache, batching, parameter sweeps.</li>
+    <li><strong>Analytics &amp; self-benchmark</strong> — significance tests, trends, clustering, anomaly detection, power analysis, and a dogfooded benchmark suite.</li>
+    <li><strong>Extensible</strong> — plugins are plain Python classes.</li>
+  </ul>
+</section>
+</main>
+
+<footer>
+  <p>MIT License — Copyright (c) 2026 username9999-sys —
+  <a href="https://github.com/username9999-sys/llmdiff">github.com/username9999-sys/llmdiff</a></p>
+</footer>
+</body>
+</html>
