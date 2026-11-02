@@ -27,6 +27,14 @@ from llmdiff.checks.ngram import (
     NgramRecallCheck,
     TokenNgramCheck,
 )
+from llmdiff.checks.numeric import MeanAbsoluteErrorCheck, NumberDriftCheck, NumberPreservedCheck
+from llmdiff.checks.qa import (
+    AnswersPromptCheck,
+    CitationCheck,
+    LanguageMatchCheck,
+    NumberConsistencyCheck,
+)
+from llmdiff.checks.safety import PiiCheck, PromptLeakCheck, SecretCheck, ToxicityCheck
 from llmdiff.checks.structure import JsonValidCheck, StructureCheck
 from llmdiff.checks.text import ContentCheck, ExactMatchCheck, LengthCheck, SimilarityCheck
 from llmdiff.core.checks import Check
@@ -59,6 +67,17 @@ __all__ = [
     "HtmlTagBalanceCheck",
     "YamlValidCheck",
     "CsvShapeCheck",
+    "PiiCheck",
+    "SecretCheck",
+    "ToxicityCheck",
+    "PromptLeakCheck",
+    "AnswersPromptCheck",
+    "NumberConsistencyCheck",
+    "CitationCheck",
+    "LanguageMatchCheck",
+    "NumberPreservedCheck",
+    "NumberDriftCheck",
+    "MeanAbsoluteErrorCheck",
 ]
 
 
@@ -91,4 +110,15 @@ def builtin_checks() -> tuple[Check, ...]:
         HtmlTagBalanceCheck(),
         YamlValidCheck(),
         CsvShapeCheck(),
+        PiiCheck(),
+        SecretCheck(),
+        ToxicityCheck(),
+        PromptLeakCheck(),
+        AnswersPromptCheck(),
+        NumberConsistencyCheck(),
+        CitationCheck(),
+        LanguageMatchCheck(),
+        NumberPreservedCheck(),
+        NumberDriftCheck(),
+        MeanAbsoluteErrorCheck(),
     )
