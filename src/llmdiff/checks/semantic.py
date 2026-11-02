@@ -75,18 +75,42 @@ class SemanticSimilarityCheck:
     n-gram fallback. Always deterministic for the same inputs.
     """
 
-    def __init__(self, model_name: str = "all-MiniLM-L6-v2", *, lazy: bool = True) -> None:
+    def __init__(
+        self,
+        model_name: str = "all-MiniLM-L6-v2",
+        *,
+        use_embeddings: bool | None = None,
+    ) -> None:
+        """Create the semantic check.
+
+        Args:
+            model_name: sentence-transformers model name (only used when
+                embeddings are enabled).
+            use_embeddings: None reads the ``LLMDIFF_EMBEDDINGS`` env var
+                (``1``/``true``/``yes``/``on`` enables). Default is **off**, so
+                the check uses the fast hashed-ngram fallback unless the user
+                explicitly opts in. This keeps ``llmdiff demo`` and CI fast
+                and fully offline.
+        """
+        if use_embeddings is None:
+            import os
+
+            use_embeddings = os.environ.get("LLMDIFF_EMBEDDINGS", "").lower() in (
+                "1",
+                "true",
+                "yes",
+                "on",
+            )
         self._model_name = model_name
+        self._use_embeddings = use_embeddings
         self._model: object | None = None
         self._model_loaded = False
-        self._lazy = lazy
         self._cache = EmbeddingCache()
-        if not lazy:
-            self._ensure_model()
 
     def _ensure_model(self) -> None:
-        """Load the sentence-transformers model once, on first use (lazy)."""
-        if self._model_loaded:
+        """Load the sentence-transformers model once, only when embeddings are on."""
+        if self._model_loaded or not self._use_embeddings:
+            self._model_loaded = True
             return
         self._model_loaded = True
         try:
