@@ -10,9 +10,23 @@ from llmdiff.checks.code import (
     FencedCodeCheck,
     PythonSyntaxCheck,
 )
+from llmdiff.checks.code_quality import (
+    IndentationCheck,
+    LongLineRatioCheck,
+    MaxLineLengthCheck,
+    TodoMarkerCheck,
+    TrailingCodeWhitespaceCheck,
+)
 from llmdiff.checks.composite import WeightedCompositeCheck
 from llmdiff.checks.cost import CostCheck, LatencyCheck, TokenCountCheck
 from llmdiff.checks.custom_regex import RegexForbiddenCheck, RegexMustMatchCheck
+from llmdiff.checks.dialogue import (
+    BulletAnswerCheck,
+    GreetingCheck,
+    QuestionAnswerCheck,
+    TurnMarkerCheck,
+    WordCountCheck,
+)
 from llmdiff.checks.diffview import DiffHunkCountCheck, EditDistanceCheck, LineChangeRatioCheck
 from llmdiff.checks.entropy import EntropyCheck, RepetitionCheck
 from llmdiff.checks.format import (
@@ -201,6 +215,16 @@ __all__ = [
     "CommentRatioCheck",
     "UpperRatioCheck",
     "NonAsciiRatioCheck",
+    "IndentationCheck",
+    "MaxLineLengthCheck",
+    "TodoMarkerCheck",
+    "LongLineRatioCheck",
+    "TrailingCodeWhitespaceCheck",
+    "QuestionAnswerCheck",
+    "TurnMarkerCheck",
+    "GreetingCheck",
+    "BulletAnswerCheck",
+    "WordCountCheck",
 ]
 
 
@@ -302,4 +326,14 @@ def builtin_checks() -> tuple[Check, ...]:
         CommentRatioCheck(),
         UpperRatioCheck(),
         NonAsciiRatioCheck(),
+        IndentationCheck(),
+        MaxLineLengthCheck(),
+        TodoMarkerCheck(),
+        LongLineRatioCheck(),
+        TrailingCodeWhitespaceCheck(),
+        QuestionAnswerCheck(),
+        TurnMarkerCheck(),
+        GreetingCheck(),
+        BulletAnswerCheck(),
+        WordCountCheck(),
     )
