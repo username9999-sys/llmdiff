@@ -72,7 +72,7 @@ def wilcoxon_signed_rank(a: Sequence[float], b: Sequence[float]) -> float:
         while j + 1 < n and diffs[j + 1][0] == diffs[i][0]:
             j += 1
         avg = (i + j) / 2.0 + 1.0
-        for k in range(i, j + 1):
+        for _ in range(i, j + 1):
             ranks.append(avg)
         i = j + 1
     w_plus = sum(r for r, (_, sign) in zip(ranks, diffs, strict=True) if sign > 0)

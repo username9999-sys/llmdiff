@@ -12,7 +12,11 @@ from llmdiff.benchmark.metrics import (
     false_positive_rate,
     throughput,
 )
-from llmdiff.benchmark.report import metrics_to_dict, render_benchmark_json, render_benchmark_markdown
+from llmdiff.benchmark.report import (
+    metrics_to_dict,
+    render_benchmark_json,
+    render_benchmark_markdown,
+)
 from llmdiff.benchmark.runner import ScenarioResult, run_all_scenarios
 
 

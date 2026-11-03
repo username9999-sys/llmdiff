@@ -32,7 +32,7 @@ class HeadingHierarchyCheck:
         levels = [len(m.group(1)) for m in _HEADING_RE.finditer(output[:_MAX])]
         if len(levels) < 2:
             return 1.0
-        skips = sum(1 for a, b in zip(levels, levels[1:]) if b > a + 1)
+        skips = sum(1 for a, b in zip(levels, levels[1:], strict=False) if b > a + 1)
         if skips == 0:
             return 1.0
         return max(0.0, 1.0 - skips / len(levels))

@@ -161,7 +161,7 @@ class MockLLMServer:
     def base_url(self) -> str:
         return f"http://127.0.0.1:{self.port}"
 
-    def start(self) -> "MockLLMServer":
+    def start(self) -> MockLLMServer:
         self._thread = threading.Thread(target=self._httpd.serve_forever, daemon=True)
         self._thread.start()
         return self
@@ -172,7 +172,7 @@ class MockLLMServer:
         if self._thread:
             self._thread.join(timeout=2.0)
 
-    def __enter__(self) -> "MockLLMServer":
+    def __enter__(self) -> MockLLMServer:
         return self.start()
 
     def __exit__(self, *exc) -> None:

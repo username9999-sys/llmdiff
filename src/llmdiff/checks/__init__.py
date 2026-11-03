@@ -40,6 +40,14 @@ from llmdiff.checks.format import (
     XmlValidCheck,
     YamlValidCheck,
 )
+from llmdiff.checks.formatting import (
+    BlankLineRunCheck,
+    EndsWithNewlineCheck,
+    LeadingBlankLinesCheck,
+    LineCountCheck,
+    TabCharCheck,
+    TrailingBlankLinesCheck,
+)
 from llmdiff.checks.grounding import CitationSupportCheck, EntityConsistencyCheck
 from llmdiff.checks.hygiene import (
     CapitalizationCheck,
@@ -225,6 +233,12 @@ __all__ = [
     "GreetingCheck",
     "BulletAnswerCheck",
     "WordCountCheck",
+    "LeadingBlankLinesCheck",
+    "TrailingBlankLinesCheck",
+    "EndsWithNewlineCheck",
+    "TabCharCheck",
+    "BlankLineRunCheck",
+    "LineCountCheck",
 ]
 
 
@@ -336,4 +350,10 @@ def builtin_checks() -> tuple[Check, ...]:
         GreetingCheck(),
         BulletAnswerCheck(),
         WordCountCheck(),
+        LeadingBlankLinesCheck(),
+        TrailingBlankLinesCheck(),
+        EndsWithNewlineCheck(),
+        TabCharCheck(),
+        BlankLineRunCheck(),
+        LineCountCheck(),
     )

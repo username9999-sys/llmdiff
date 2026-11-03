@@ -68,7 +68,7 @@ def jaro_winkler(a: str, b: str) -> float:
     transpositions //= 2
     jaro = (matches / la + matches / lb + (matches - transpositions) / matches) / 3.0
     prefix = 0
-    for x, y in zip(sa, sb):
+    for x, y in zip(sa, sb, strict=False):
         if x == y and prefix < 4:
             prefix += 1
         else:
