@@ -70,6 +70,7 @@ from llmdiff.checks.rouge import Rouge1Check, Rouge2Check, RougeLCheck
 from llmdiff.checks.safety import PiiCheck, PromptLeakCheck, SecretCheck, ToxicityCheck
 from llmdiff.checks.semantic import SemanticSimilarityCheck
 from llmdiff.checks.sentiment import SentimentCheck, ToneMatchCheck
+from llmdiff.checks.similarity_extra import JaroWinklerCheck, TrigramSimilarityCheck
 from llmdiff.checks.structure import JsonValidCheck, StructureCheck
 from llmdiff.checks.structure_md import (
     AvgWordLengthCheck,
@@ -184,6 +185,8 @@ __all__ = [
     "TokenOverlapCheck",
     "UniqueTokenRatioCheck",
     "DigitRatioCheck",
+    "TrigramSimilarityCheck",
+    "JaroWinklerCheck",
 ]
 
 
@@ -277,4 +280,6 @@ def builtin_checks() -> tuple[Check, ...]:
         TokenOverlapCheck(),
         UniqueTokenRatioCheck(),
         DigitRatioCheck(),
+        TrigramSimilarityCheck(),
+        JaroWinklerCheck(),
     )
