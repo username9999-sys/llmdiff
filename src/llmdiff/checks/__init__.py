@@ -26,12 +26,25 @@ from llmdiff.checks.format import (
     YamlValidCheck,
 )
 from llmdiff.checks.judge import JudgeCheck
+from llmdiff.checks.bleu import BleuCheck
+from llmdiff.checks.instructions import (
+    FormatFollowCheck,
+    JsonModeCheck,
+    LengthInstructionCheck,
+    NoApologyCheck,
+)
 from llmdiff.checks.lists import (
     ListItemCountCheck,
     ListItemOverlapCheck,
     ListOrderCheck,
     TableShapeCheck,
 )
+from llmdiff.checks.readability import (
+    FleschKincaidCheck,
+    SentenceStatsCheck,
+    SyllableCountCheck,
+)
+from llmdiff.checks.rouge import Rouge1Check, Rouge2Check, RougeLCheck
 from llmdiff.checks.ngram import (
     NgramF1Check,
     NgramPrecisionCheck,
@@ -115,6 +128,17 @@ __all__ = [
     "RegexForbiddenCheck",
     "SemanticSimilarityCheck",
     "JudgeCheck",
+    "Rouge1Check",
+    "Rouge2Check",
+    "RougeLCheck",
+    "BleuCheck",
+    "FleschKincaidCheck",
+    "SyllableCountCheck",
+    "SentenceStatsCheck",
+    "FormatFollowCheck",
+    "JsonModeCheck",
+    "LengthInstructionCheck",
+    "NoApologyCheck",
 ]
 
 
@@ -176,4 +200,15 @@ def builtin_checks() -> tuple[Check, ...]:
         RegexForbiddenCheck(),
         SemanticSimilarityCheck(),
         JudgeCheck(),
+        Rouge1Check(),
+        Rouge2Check(),
+        RougeLCheck(),
+        BleuCheck(),
+        FleschKincaidCheck(),
+        SyllableCountCheck(),
+        SentenceStatsCheck(),
+        FormatFollowCheck(),
+        JsonModeCheck(),
+        LengthInstructionCheck(),
+        NoApologyCheck(),
     )
