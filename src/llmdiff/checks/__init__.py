@@ -79,6 +79,12 @@ from llmdiff.checks.structure_md import (
     ParagraphCountCheck,
 )
 from llmdiff.checks.text import ContentCheck, ExactMatchCheck, LengthCheck, SimilarityCheck
+from llmdiff.checks.tokenmix import (
+    CodeRatioCheck,
+    DigitRatioCheck,
+    TokenOverlapCheck,
+    UniqueTokenRatioCheck,
+)
 from llmdiff.checks.topics import KeywordCoverageCheck, TopicDriftCheck
 from llmdiff.checks.unicode import (
     ControlCharCheck,
@@ -174,6 +180,10 @@ __all__ = [
     "NestingDepthCheck",
     "ParagraphCountCheck",
     "AvgWordLengthCheck",
+    "CodeRatioCheck",
+    "TokenOverlapCheck",
+    "UniqueTokenRatioCheck",
+    "DigitRatioCheck",
 ]
 
 
@@ -263,4 +273,8 @@ def builtin_checks() -> tuple[Check, ...]:
         NestingDepthCheck(),
         ParagraphCountCheck(),
         AvgWordLengthCheck(),
+        CodeRatioCheck(),
+        TokenOverlapCheck(),
+        UniqueTokenRatioCheck(),
+        DigitRatioCheck(),
     )
