@@ -48,6 +48,14 @@ from llmdiff.checks.lists import (
     ListOrderCheck,
     TableShapeCheck,
 )
+from llmdiff.checks.misc import (
+    CommentRatioCheck,
+    EmojiCountCheck,
+    EmojiPresenceCheck,
+    NonAsciiRatioCheck,
+    UpperRatioCheck,
+    UrlValidityCheck,
+)
 from llmdiff.checks.ngram import (
     NgramF1Check,
     NgramPrecisionCheck,
@@ -187,6 +195,12 @@ __all__ = [
     "DigitRatioCheck",
     "TrigramSimilarityCheck",
     "JaroWinklerCheck",
+    "EmojiCountCheck",
+    "EmojiPresenceCheck",
+    "UrlValidityCheck",
+    "CommentRatioCheck",
+    "UpperRatioCheck",
+    "NonAsciiRatioCheck",
 ]
 
 
@@ -282,4 +296,10 @@ def builtin_checks() -> tuple[Check, ...]:
         DigitRatioCheck(),
         TrigramSimilarityCheck(),
         JaroWinklerCheck(),
+        EmojiCountCheck(),
+        EmojiPresenceCheck(),
+        UrlValidityCheck(),
+        CommentRatioCheck(),
+        UpperRatioCheck(),
+        NonAsciiRatioCheck(),
     )
