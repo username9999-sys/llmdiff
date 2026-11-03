@@ -27,6 +27,14 @@ from llmdiff.checks.format import (
     YamlValidCheck,
 )
 from llmdiff.checks.grounding import CitationSupportCheck, EntityConsistencyCheck
+from llmdiff.checks.hygiene import (
+    CapitalizationCheck,
+    DoubleSpaceCheck,
+    PunctuationCheck,
+    QuoteBalanceCheck,
+    TrailingWhitespaceCheck,
+    WhitespaceCheck,
+)
 from llmdiff.checks.instructions import (
     FormatFollowCheck,
     JsonModeCheck,
@@ -63,6 +71,13 @@ from llmdiff.checks.safety import PiiCheck, PromptLeakCheck, SecretCheck, Toxici
 from llmdiff.checks.semantic import SemanticSimilarityCheck
 from llmdiff.checks.sentiment import SentimentCheck, ToneMatchCheck
 from llmdiff.checks.structure import JsonValidCheck, StructureCheck
+from llmdiff.checks.structure_md import (
+    AvgWordLengthCheck,
+    FenceLanguageCheck,
+    HeadingHierarchyCheck,
+    NestingDepthCheck,
+    ParagraphCountCheck,
+)
 from llmdiff.checks.text import ContentCheck, ExactMatchCheck, LengthCheck, SimilarityCheck
 from llmdiff.checks.topics import KeywordCoverageCheck, TopicDriftCheck
 from llmdiff.checks.unicode import (
@@ -148,6 +163,17 @@ __all__ = [
     "ToneMatchCheck",
     "EntityConsistencyCheck",
     "CitationSupportCheck",
+    "PunctuationCheck",
+    "CapitalizationCheck",
+    "WhitespaceCheck",
+    "QuoteBalanceCheck",
+    "TrailingWhitespaceCheck",
+    "DoubleSpaceCheck",
+    "HeadingHierarchyCheck",
+    "FenceLanguageCheck",
+    "NestingDepthCheck",
+    "ParagraphCountCheck",
+    "AvgWordLengthCheck",
 ]
 
 
@@ -226,4 +252,15 @@ def builtin_checks() -> tuple[Check, ...]:
         ToneMatchCheck(),
         EntityConsistencyCheck(),
         CitationSupportCheck(),
+        PunctuationCheck(),
+        CapitalizationCheck(),
+        WhitespaceCheck(),
+        QuoteBalanceCheck(),
+        TrailingWhitespaceCheck(),
+        DoubleSpaceCheck(),
+        HeadingHierarchyCheck(),
+        FenceLanguageCheck(),
+        NestingDepthCheck(),
+        ParagraphCountCheck(),
+        AvgWordLengthCheck(),
     )
