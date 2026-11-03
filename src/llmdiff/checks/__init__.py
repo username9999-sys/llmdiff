@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from llmdiff.checks.bleu import BleuCheck
 from llmdiff.checks.code import (
     BraceBalanceCheck,
     CodeBlockCountCheck,
@@ -25,26 +26,20 @@ from llmdiff.checks.format import (
     XmlValidCheck,
     YamlValidCheck,
 )
-from llmdiff.checks.judge import JudgeCheck
-from llmdiff.checks.bleu import BleuCheck
+from llmdiff.checks.grounding import CitationSupportCheck, EntityConsistencyCheck
 from llmdiff.checks.instructions import (
     FormatFollowCheck,
     JsonModeCheck,
     LengthInstructionCheck,
     NoApologyCheck,
 )
+from llmdiff.checks.judge import JudgeCheck
 from llmdiff.checks.lists import (
     ListItemCountCheck,
     ListItemOverlapCheck,
     ListOrderCheck,
     TableShapeCheck,
 )
-from llmdiff.checks.readability import (
-    FleschKincaidCheck,
-    SentenceStatsCheck,
-    SyllableCountCheck,
-)
-from llmdiff.checks.rouge import Rouge1Check, Rouge2Check, RougeLCheck
 from llmdiff.checks.ngram import (
     NgramF1Check,
     NgramPrecisionCheck,
@@ -58,10 +53,18 @@ from llmdiff.checks.qa import (
     LanguageMatchCheck,
     NumberConsistencyCheck,
 )
+from llmdiff.checks.readability import (
+    FleschKincaidCheck,
+    SentenceStatsCheck,
+    SyllableCountCheck,
+)
+from llmdiff.checks.rouge import Rouge1Check, Rouge2Check, RougeLCheck
 from llmdiff.checks.safety import PiiCheck, PromptLeakCheck, SecretCheck, ToxicityCheck
 from llmdiff.checks.semantic import SemanticSimilarityCheck
+from llmdiff.checks.sentiment import SentimentCheck, ToneMatchCheck
 from llmdiff.checks.structure import JsonValidCheck, StructureCheck
 from llmdiff.checks.text import ContentCheck, ExactMatchCheck, LengthCheck, SimilarityCheck
+from llmdiff.checks.topics import KeywordCoverageCheck, TopicDriftCheck
 from llmdiff.checks.unicode import (
     ControlCharCheck,
     MojibakeCheck,
@@ -139,6 +142,12 @@ __all__ = [
     "JsonModeCheck",
     "LengthInstructionCheck",
     "NoApologyCheck",
+    "KeywordCoverageCheck",
+    "TopicDriftCheck",
+    "SentimentCheck",
+    "ToneMatchCheck",
+    "EntityConsistencyCheck",
+    "CitationSupportCheck",
 ]
 
 
@@ -211,4 +220,10 @@ def builtin_checks() -> tuple[Check, ...]:
         JsonModeCheck(),
         LengthInstructionCheck(),
         NoApologyCheck(),
+        KeywordCoverageCheck(),
+        TopicDriftCheck(),
+        SentimentCheck(),
+        ToneMatchCheck(),
+        EntityConsistencyCheck(),
+        CitationSupportCheck(),
     )
