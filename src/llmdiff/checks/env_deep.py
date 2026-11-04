@@ -41,7 +41,10 @@ _SNAKE_RE = re.compile(r"^[a-z_][a-z0-9_]*$")
 _DOT_RE = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*\.[A-Za-z0-9_.-]+$")
 _DASH_RE = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*-[A-Za-z0-9_.-]+$")
 _EMPTY_RE = re.compile(r"=\s*$", re.MULTILINE)
-_SECRET_NAME_RE = re.compile(r"^(?:.*(?:KEY|TOKEN|SECRET|PASSWORD|PASSWD|PWD|CREDENTIAL|AUTH))", re.IGNORECASE)
+_SECRET_NAME_RE = re.compile(
+    r"^(?:.*(?:KEY|TOKEN|SECRET|PASSWORD|PASSWD|PWD|CREDENTIAL|AUTH))",
+    re.IGNORECASE,
+)
 _URL_VAL_RE = re.compile(r'=\s*"?https?://', re.MULTILINE | re.IGNORECASE)
 _NUM_VAL_RE = re.compile(r'=\s*"?-?\d+(?:\.\d+)?"?\s*$', re.MULTILINE)
 _BOOL_VAL_RE = re.compile(r'=\s*"?(?:true|false)"?\s*$', re.MULTILINE | re.IGNORECASE)
